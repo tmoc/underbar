@@ -8,6 +8,7 @@ var _ = {};
   // seem very useful, but remember it--if a function needs to provide an
   // iterator when the user does not pass one in, this will be handy.
   _.identity = function(val) {
+  	return val;
   };
 
   /**
@@ -38,6 +39,13 @@ var _ = {};
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
+    if (n === 0) {
+    	return [];
+    } else if (n > array.length) {
+    	return array;
+    } else {
+  	  return n === undefined ? array[array.length - 1] : array.slice(n - 1);
+    }
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -46,6 +54,18 @@ var _ = {};
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
   _.each = function(collection, iterator) {
+  	var i;
+  	var property;
+
+    if (collection instanceof Array) {
+      for (i = 0; i < collection.length; i += 1) {
+  		  iterator(collection[i], i, collection);
+  	  }
+    } else {
+      for (property in collection) {
+      	iterator(collection[property], property, collection);
+      }
+    }
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
@@ -67,16 +87,44 @@ var _ = {};
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
+  	var result = [];
+
+    _.each(collection, function (item) {
+    	if (test(item)) {
+    		result.push(item);
+    	}
+    });
+
+    return result;
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+    var result = [];
+    var passed = _.filter(collection, test);
+
+    _.each(collection, function (item) {
+    	if (_.indexOf(passed, item) === -1) {
+    		result.push(item);
+    	}
+    });
+
+    return result;
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
+  	var result = [];
+
+  	_.each(array, function (item) {
+  		if (_.indexOf(result, item) === -1) {
+  			result.push(item);
+  		}
+  	});
+
+  	return result;
   };
 
 
