@@ -55,15 +55,15 @@ var _ = {};
   // iterator function over each item in the input collection.
   _.each = function(collection, iterator) {
   	var i;
-  	var property;
+  	var p;
 
     if (collection instanceof Array) {
       for (i = 0; i < collection.length; i += 1) {
   		  iterator(collection[i], i, collection);
   	  }
     } else {
-      for (property in collection) {
-      	iterator(collection[property], property, collection);
+      for (p in collection) {
+      	iterator(collection[p], p, collection);
       }
     }
   };
@@ -133,6 +133,13 @@ var _ = {};
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    var result = [];
+
+    _.each(collection, function (item) {
+      result.push(iterator(item));
+    });
+
+    return result;
   };
 
   /*
@@ -156,22 +163,50 @@ var _ = {};
   // Calls the method named by methodName on each value in the list.
   // Note: you will nead to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
+    var result = [];
+
+    _.each(collection, function (item) {
+      if (item[functionOrKey]) {
+        result.push(item[functionOrKey].apply(item, args));
+        //result.push(item);
+      } else {
+        result.push(functionOrKey.apply(item, args));
+        //result.push(item);
+      }
+    });
+
+    return result;
   };
 
-  // Reduces an array or object to a single value by repetitively calling
-  // iterator(previousValue, item) for each item. previousValue should be
+  // reduces an array or object to a single value by repetitively calling
+  // iterator(previousvalue, item) for each item. previousvalue should be
   // the return value of the previous iterator call.
   //
-  // You can pass in an initialValue that is passed to the first iterator
-  // call. If initialValue is not explicitly passed in, it should default to the
+  // you can pass in an initialvalue that is passed to the first iterator
+  // call. if initialvalue is not explicitly passed in, it should default to the
   // first element in the collection.
   //
-  // Example:
+  // example:
   //   var numbers = [1,2,3];
   //   var sum = _.reduce(numbers, function(total, number){
   //     return total + number;
   //   }, 0); // should be 6
   _.reduce = function(collection, iterator, accumulator) {
+    if (accumulator !== undefined) {
+      _.each(collection, function (item) {
+        accumulator = iterator(accumulator, item);
+      });
+      return accumulator;
+    } else {
+      _.each(collection, function (item) {
+        if (accumulator === undefined) {
+          accumulator = item;
+        } else {
+          accumulator = iterator(accumulator, item);
+        }
+      });
+      return accumulator;
+    }
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -190,6 +225,8 @@ var _ = {};
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    var pass = true;
+
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
